@@ -112,3 +112,13 @@
   - Electron 등
 
 ## 1.4 개발 환경 설정하기
+- Ubuntu 기준
+  - https://github.com/nodesource/distributions/blob/master/README.md
+  - 설치 확인
+    - 터미널에 다음 명령어를 입력해서 정상출력되는지 확인
+    - $ node -v
+    - $ npm -v
+  - npm의 버전 업데이트
+    - $ sudo npm install -g npm
+  - VS Code 설치
+    - https://code.visualstudio.com/docs/setup/linux
