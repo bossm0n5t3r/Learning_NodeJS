@@ -102,6 +102,13 @@
   - 이미지나 비디오 처리, 대규모 데이터 처리 같이 CPU를 많이 사용하는 작업을 위한 서버로는 x
   - AWS Lambda 나 Google Cloud Functions 같은 서비스에서 노드로 CPU를 많이 사용하는 작업을 처리하는 것을 지원
 
-
 ## 1.3 서버 외의 노드
+- 웹, 모바일, 데스크톱 애플리케이션 개발에도 사용됨
+- 대표적인 웹 프레임워크
+  - Angular, React, Vue, Metror 등
+- 모바일 개발 도구
+  - React Native와 Ionic Framework 등
+- 데스크톱 개발 도구
+  - Electron 등
+
 ## 1.4 개발 환경 설정하기
