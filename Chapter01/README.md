@@ -1,4 +1,4 @@
-# 노드란 무엇인가
+# What is a Node.js
 
 ## 목차
 - [1. 핵심 개념](#core-concept)
