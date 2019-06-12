@@ -1,21 +1,23 @@
-# What is a Node.js
+# What is a [Node.js](https://nodejs.org/en/about/)
 
 ## 목차
-- [1. 핵심 개념](#core-concept)
-  - [1.1. 서버](#what-is-server)
+- [1. Core concepts](#core-concepts)
+  - [1.1. 서버](#what-is-a-server)
   - [1.2. 특성 및 라이브러리](#library)
   - [1.3. 이벤트 기반](#event-driven)
-  - [1.4. 논블로킹 I/O](#non-blocking-io)
-  - [1.5. 싱글 스레드](#single-thread)
+  - [1.4. 이벤트 루프](#event-loop)
+  - [1.5. 논블로킹 I/O](#non-blocking-io)
+  - [1.6. 블로킹 vs 논블로킹](#blocking-vs-non-blocking)
+  - [1.7. 싱글 스레드](#single-thread)
 - [2. 서버로서의 노드](#node-as-a-server)
 - [3. 개발 환경 설정](#dev-env-settings)
 
 <hr/>
 
-<a name="core-concept"></a>
-## 1. 핵심 개념
+<a name="core-concepts"></a>
+## 1. [Core concepts](https://nodejs.org/en/docs/guides/#node-js-core-concepts)
 
-<a name="what-is-server"></a>
+<a name="what-is-a-server"></a>
 - ### 1.1. 서버
   - 노드는 서버 애플리케이션을 실행하는데 제일 많이 사용
   - 서버란 무엇이며, 어떤 역할을 하는가?
@@ -29,8 +31,8 @@
 <a name="library"></a>
 - ### 1.2. 특성 및 라이브러리
   - 노드는 <strong>자바스크립트 런타임</strong>
-  - 노드는 V8, libuv 라는 라이브러리를 사용
-  - libuv 라이브러리는 노드의 특성인 <strong>[이벤트 기반](#1.3.-이벤트-기반), [논블로킹 I/O](#1.4.-논블로킹-I/O) 모델을 구현</strong>
+  - 노드는 V8, [libuv](http://libuv.org/) 라는 라이브러리를 사용
+  - [libuv](http://libuv.org/) 라이브러리는 노드의 특성인 <strong>[이벤트 기반](#event-driven), [논블로킹 I/O](#non-blocking-io) 모델을 구현</strong>
 
 <a name="event-driven"></a>
 - ### 1.3. 이벤트 기반
@@ -39,7 +41,7 @@
   - 이벤트 기반 시스템에서는 특정 이벤트가 발생할 때 무엇을 할지 미리 등록해두어야 함
   - 노드는 이벤트 기반 방식으로 동작
   - 노드는 발생한 이벤트가 없거나 발생했던 이벤트를 다 처리하면 다음 이벤트가 발생할 때까지 대기
-  - 이벤트 루프
+  - [이벤트 루프](#event-loop)
     - 이벤트 발생 시 호출할 콜백 함수들을 관리하고, 호출된 콜백 함수의 실행 순서를 결정
     - 노드가 종료될 때까지 이벤트 처리를 위한 작업을 반복하므로 루프
     - 호출 <strong>스택</strong>을 통해서 실행
@@ -50,8 +52,54 @@
     - 타이머 or I/O 작업 콜백 or 이벤트 리스너들이 대기하는 곳
   - 이벤트 루프는 호출 스택이 비어있을 때만 태스크 큐에 있는 함수를 호출 스택으로 가져옴
 
+<a name="event-loop"></a>
+- ### 1.4. 이벤트 루프
+  - 이벤트 루프란?
+    - 이벤트 루프는 가능하다면 언제나 시스템 커널에 작업을 떠넘겨서 Node.js가 논 블로킹 I/O 작업을 수행하도록 해줌
+    - 대부분의 현대 커널은 멀티 스레드이므로 백그라운드에서 다수의 작업을 실행
+    - 이러한 작업 중 하나가 완료되면 커널이 Node.js에게 알려주어 적절한 콜백을 **poll** 큐에 추가할 수 있게 하여 결국 실행
+  - 이벤트 루프 설명
+    - 이벤트 루프의 작업 순서의 간단한 개요
+    - ```
+        ┌───────────────────────────┐
+      ┌─>│           timers          │
+      │  └─────────────┬─────────────┘
+      │  ┌─────────────┴─────────────┐
+      │  │     pending callbacks     │
+      │  └─────────────┬─────────────┘
+      │  ┌─────────────┴─────────────┐
+      │  │       idle, prepare       │
+      │  └─────────────┬─────────────┘      ┌───────────────┐
+      │  ┌─────────────┴─────────────┐      │   incoming:   │
+      │  │           poll            │<─────┤  connections, │
+      │  └─────────────┬─────────────┘      │   data, etc.  │
+      │  ┌─────────────┴─────────────┐      └───────────────┘
+      │  │           check           │
+      │  └─────────────┬─────────────┘
+      │  ┌─────────────┴─────────────┐
+      └──┤      close callbacks      │
+        └───────────────────────────┘
+      ```
+    - 출처
+      - https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/
+    - 각 단계는 실행할 콜백의 FIFO 큐를 가짐
+    - 각 단계는 자신만의 방법에 제한적이므로 보통 이벤트 루프가 해당 단계에 진입하면 해당 단계에 한정된 작업을 수행하고 큐를 모두 소진하거나 콜백의 최대 개수를 실행할 때까지 해당 단계의 큐에서 콜백을 실행
+    - 큐를 모두 소진하거나 콜백 제한에 이르면 이벤트 루프는 다음 단계로 이동
+    - 이러한 작업이 또 다른 작업을 스케줄링하거나 **poll** 단계에서 처리된 새로운 이벤트가 커널에 의해 큐에 추가될 수 있으므로 폴링 이벤트를 처리하면서 poll 이벤트를 큐에 추가할 수 있음
+    - 그 결과 오래 실행되는 콜백은 poll 단계가 타이머의 한계 시점보다 훨씬 더 오래 실행되도록 할 수 있음
+  - 단계 개요
+    - **timers**: 이 단계는 `setTimeout()`과 `setInterval()`로 스케줄링한 콜백을 실행
+    - **pending callbacks**: 다음 루프 반복으로 연기된 I/O 콜백들을 실행
+    - **idle, prepare**: 내부용으로만 사용
+    - **poll**: 새로운 I/O 이벤트를 가져옴
+      - I/O와 연관된 콜백(클로즈 콜백, 타이머로 스케줄링된 콜백, `setImmediate()`를 제외한 거의 모든 콜백)을 실행
+      - 적절한 시기에 node는 여기서 블록
+    - **check**: `setImmediate()` 콜백은 여기서 호출
+    - **close callbacks**: 일부 close 콜백들, 예를 들어 `socket.on('close', ...)`.
+    - 이벤트 루프가 실행하는 사이 Node.js는 다른 비동기 I/O나 타이머를 기다리고 있는지 확인하고 기다리고 있는 것이 없다면 깔끔하게 종료
+
 <a name="non-blocking-io"></a>
-- ### 1.4. 논블로킹 I/O
+- ### 1.5. 논블로킹 I/O
   - 이벤트 루프를 잘 활용하면 오래 걸리는 작업을 효율적으로 처리할 수 있음
   - 논블로킹 방식
     - 오래 걸리는 함수를 백그라운드로 보내서 다음 코드가 먼저 실행되게 하고, 그 함수가 다시 태스크 큐를 거쳐 호출 스택으로 올라오기를 기다리는 방식
@@ -73,8 +121,67 @@
     - 호출한 함수가 바로 return 되어 다음 작업으로 넘어가고, 백그라운드 작업 완료 여부는 신경 쓰지 않고 나중에 백그라운드가 알림을 줄 때 처리
   - 동기-논블로킹, 비동기-블로킹 방식은 없다고 보면 됨
 
+<a name="blocking-vs-non-blocking"></a>
+- ### 1.6. [블로킹 vs 논블로킹](https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/)
+  - 블로킹 (blocking)
+    - Node.js 프로세스에서 추가적인 JavaScript 의 실행을 위해 JavaScript 가 아닌 작업이 완료될 때까지 기다려야만 하는 상황
+      - 이벤트 루프가 블로킹 작업을 하는 동안 JavaScript 실행을 계속할 수 없기 때문에
+    - I/O 등의 JavaScript가 아닌 작업을 기다리는 것보다 CPU 집약적인 작업 때문에 나쁜 성능을 보여주는 JavaScript는 보통 블로킹이라고 부르지 않음
+    - libuv를 사용하는 Node.js 표준 라이브러리의 동기 메서드가 가장 대표적인 블로킹 작업
+    - 네이티브 모듈도 블로킹 메서드를 가질 수 있음
+    - Node.js 표준 라이브러리의 모든 I/O 메서드는 논블로킹인 비동기 방식을 제공하고 콜백 함수를 받음
+    - 일부 메서드는 같은 작업을 하는 블로킹 메서드도 가지는데 이는 이름 마지막에 Sync가 붙음
+  - 코드 비교
+    - **블로킹** 메서드는 **동기**로 실행되고 **논블로킹** 메서드는 **비동기**로 실행
+    - 파일 시스템 모듈을 사용할 때
+      - 동기
+        - ```javascript
+          const fs = require('fs');
+          const data = fs.readFileSync('/file.md'); // 파일을 읽을 때까지 여기서 블로킹됩니다.
+          console.log(data);
+          // moreWork();는 console.log 이후 실행될 것입니다.
+          ```
+        - 두 번째 줄에서 전체 파일을 읽을 때까지 다른 JavaScript 실행이 블로킹되는 단점
+      - 비동기
+        - ```javascript
+          const fs = require('fs');
+          fs.readFile('/file.md', (err, data) => {
+            if (err) throw err;
+            console.log(data);
+          });
+          // moreWork();는 console.log 이전에 실행될 것입니다.
+          ```
+  - 동시성과 스루풋
+    - 동시성
+      - 다른 작업이 완료된 후에 JavaScript 콜백 함수를 실행하는 이벤트 루프의 능력을 의미
+      - 동시에 실행되어야 하는 모든 코드는 I/O 등의 JavaScript가 아닌 작업이 일어나는 동안 이벤트 루프가 계속 실행될 수 있도록 해야함
+  - 블로킹과 논블로킹 코드를 섞을 때의 위험성
+    - 코드
+      - 잘못된 예시
+        - ```javascript
+          const fs = require('fs');
+          fs.readFile('/file.md', (err, data) => {
+            if (err) throw err;
+            console.log(data);
+          });
+          fs.unlinkSync('/file.md');
+          ```
+        - fs.unlinkSync()가 fs.readFile()보다 먼저 실행될 수 있으므로 실제 file.md를 읽기 전에 파일을 제거할 수 있음
+      - 수정된 예시
+        - ```javascript
+          const fs = require('fs');
+          fs.readFile('/file.md', (readFileErr, data) => {
+            if (readFileErr) throw readFileErr;
+            console.log(data);
+            fs.unlink('/file.md', (unlinkErr) => {
+              if (unlinkErr) throw unlinkErr;
+            });
+          });
+          ```
+        - fs.readFile()의 콜백에서 fs.unlink()를 논블로킹으로 호출하도록 해서 작업 순서가 올바르도록 보장
+
 <a name="single-thread"></a>
-- ### 1.5. 싱글 스레드
+- ### 1.7. 싱글 스레드
   - 노드는 <strong>싱글 스레드, 논블로킹 모델</strong>
   - 프로세스
     - 운영체제에서 할당하는 작업의 단위
