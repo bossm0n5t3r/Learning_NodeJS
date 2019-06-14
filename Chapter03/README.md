@@ -30,17 +30,17 @@
 - process.exit(코드)
   - [exit.js](./3.4/exit.js)
 
-## OS
+## [OS](https://nodejs.org/api/os.html)
 - [os.js](./3.5/os.js)
 
-## Path
+## [Path](https://nodejs.org/api/path.html)
 - [path.js](./3.5/path.js)
 
-## URL
+## [URL](https://nodejs.org/api/url.html)
 - [url.js](./3.5/url.js)
 - [searchParams.js](./3.5/searchParams.js)
 
-## Query String
+## [Query String](https://nodejs.org/api/querystring.html)
 - [querystring.js](./3.5/querystring.js)
 
 ## [Crypto](https://nodejs.org/api/crypto.html)
@@ -48,7 +48,7 @@
 - [pbkdf2.js](./3.5/pbkdf2.js)
 - [cipher.js](./3.5/cipher.js)
 
-## Util
+## [Util](https://nodejs.org/api/util.html)
 - [util.js](./3.5/util.js)
 
 ## [File System](https://nodejs.org/api/fs.html)
