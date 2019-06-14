@@ -1,8 +1,9 @@
 const http = require('http');
 const fs = require('fs');
+const path = require('path');
 
 http.createServer((req, res) => {
-    fs.readFile('./server2.html', (err, data) => {
+    fs.readFile(path.resolve(__dirname, './server2.html'), (err, data) => {
         if (err) {
             throw err;
         }
