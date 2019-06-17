@@ -1,0 +1,45 @@
+# Creating a Web server with the http module
+
+## Request and Response
+- 클라이언트 --- 요청 (request)  --> 서버
+- 클라이언트 <-- 응답 (response) --- 서버
+- [createServer.js](./4.1/createServer.js)
+  - http 서버가 있어야 웹 브라우저의 요청을 처리할 수 있으므로 [http 모듈](https://nodejs.org/api/http.html) 사용
+  - createServer
+    - http 모듈에 포함
+    - 인자로 요청에 대한 콜백함수를 넣을 수 있음
+    - 요청이 들어올 때마다 매번 콜백 함수가 실행
+    - 따라서 콜백 함수에 응답을 적어주면 됨
+    - 콜백 함수의 매개 변수
+      - 매개 변수의 이름은 자유롭게 바꿔도 됨
+      - req (request)
+        - 요청에 관한 정보
+      - res (response)
+        - 응답에 관한 정보
+- [server1.js](./4.1/server1.js)
+  - createServer 메서드 뒤에 listen 메서드를 붙이고 클라이언트에게 공개할 포트 번호와 포트 연결 완료 후 실행될 콜백 함수를 넣어줌
+  - 이 파일을 실행하면 서버는 8080 포트에서 요청 대기
+- [server1-0.js](./4.1/server1-0.js)
+  - [server1.js](./4.1/server1.js)에서 listen 메서드에 콜백 함수를 넣는 대신, [server1-0.js](./4.1/server1-0.js)같이 서버에 listening 이벤트 리스너를 붙여도 됨
+  - 추가로 error 이벤트 리스너도 붙임
+  - res 객체에는 [res.write](https://nodejs.org/api/http.html#http_response_write_chunk_encoding_callback) 와 [res.end](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback) 메서드가 있음
+    - [res.write](https://nodejs.org/api/http.html#http_response_write_chunk_encoding_callback)
+      - 첫 번째 parameter는 chunk
+        - 반드시 포함
+        - chunk는 string 또는 buffer 로 구성되어 있음
+        - 만약 chunk가 string이면, 두 번째 parameter는 byte stream으로 인코딩하는 방법을 지정
+        - 클라이언트로 보낼 데이터
+      - 두 번째 parameter는 encoding
+        - 생략이 가능함
+        - Default : 'utf-8'
+      - 세 번째 parameter는 callback function
+        - 생략이 가능함
+        - chunk of data 가 flushed 되면 호출됨
+    - [res.end](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback)
+      - 응답을 종료하는 메서드
+      - 만약 data가 있다면, data도 클라이언트에 보내고 응답을 종료
+      - 이 method 는 **반드시 각각의 response 마다 호출**해야 함
+        - 안하는 경우 클라이언트는 호출되기를 계속 대기
+- [server2.html](./4.1/server2.html), [server2.js](./4.1/server2.js)
+  - 요청이 들어오면 fs 모듈로 HTML 파일을 읽음
+  - 그리고 data 변수에 저장된 버퍼를 그대로 클라이언트에 보내면 됨
