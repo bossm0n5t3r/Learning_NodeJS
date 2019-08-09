@@ -158,4 +158,27 @@
     | DELETE      | /users/사용자id | 해당 id의 사용자 제거  	 |
 
 ## http and http2
+- https 모듈은 웹 서버에 SSL 암호화를 추가
+- GET 이나 POST 요청을 할 때 오고 가는 데이터를 암호화해서 중간에 요청을 훔쳐가도 내용을 확인할 수 없게 만듦
+- 요즘은 로그인이나 결제가 필요한 창에서 https 적용은 필수
+- [server1.js](./4.4/server1.js)
+  - 이 서버에 암호화를 적용하려면 https 모듈을 사용
+  - 암호화를 적용하는 만큼, 그것을 인증해줄 수 있는 기관도 필요
+  - 인증서는 인증 기관에서 구입
+  - [Let's Encrypt](https://letsencrypt.org/) 같은 기관에서 무료로 발급도 가능
+  - 발급받은 인증서가 있다면 다음과 같이 하면 됨
+- [server1-1.js](./4.4/server1-1.js)
+  - createServer 메서드가 두 개의 인자를 받음
+    - 인증서에 관련된 옵션 객체
+    - http 모듈과 같은 서버 로직
+  - 인증서를 구입하면 pem 이나 crt, 또는 key 확장자를 가진 파일들을 제공
+  - 이 파일들을 fs.readFileSync 메서드로 읽어서 cert, key, ca 옵션에 알맞게 넣어주면 됨
+- [server1-2.js](./4.4/server1-2.js)
+  - 노드의 http2 모듈은 SSL 암호화와 더불어 http/2 프로토콜을 사용할 수 있게 해줌
+  - http/2는 요청 및 응답 방식이 기존 http/1.1 보다 개선되어 훨씬 효율적으로 요청 보냄
+  - http/2를 사용하면 웹의 속도도 많이 개선
+  - https 모듈과 거의 유사
+    - https -> http2 
+    - createServer -> createSecureServer
+
 ## cluster
