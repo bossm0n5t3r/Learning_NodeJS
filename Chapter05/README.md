@@ -92,4 +92,21 @@
     | @lastest | 최신 (x로도 표현)                   |
 
 ## npm commands
+- |명령어                                         |기능                                                                                                      |
+  |:---------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
+  | npm outdated                                  |업데이트할 수 있는 패키지가 있는지 확인                                                                 	 |
+  | npm update [패키지명]   	                    |업데이트   	                                                                                             |
+  | npm update   	                                |업데이트 가능한 패키지가 모두 Wanted 에 적힌 버전으로 업데이트   	                                       |
+  | npm uninstall [패키지명]<br>npm rm [패키지명] |해당 패키지를 제거<br>패키지가 node_modules폴더와 package.json에서 사라짐   	                             |
+  | npm search [검색어]   	                      |npm의 패키지를 검색   	                                                                                   |
+  | npm info [패키지명]   	                      |패키지의 세부정보<br>package.json의 내용과 의존관계, 설치 가능한 버전 정보 등   	                         |
+  | npm adduser   	                              |npm 로그인을 위한 명령어<br>npm 공식 사이트에서 가입한 계정으로 로그인                              	     |
+  | npm whoami                                    | 로그인한 사용자가 누구인지 알려줌<br>로그인된 상태가 아니면 에러 발생                                    |
+  | npm logout                                    | npm adduser로 로그인한 계정을 로그아웃할 때 사용                                                         |
+  | npm version [버전]                            | package.json의 버전을 올려줌<br>버전 대신에 major, minor, patch라는 문자열을 넣으면 해당 부분의 숫자 + 1 |
+  | npm deprecate [패키지명][버전] [메시지]       | 해당 패키지를 설치할 때 경고 메시지를 띄우게 하는 명령어<br>자신의 패키지에만 명령서 적용 가능           |
+  | npm publish                                   | 자신이 만든 패키지를 배포할 때 사용                                                                      |
+  | npm unpublish                                 | 배포한 패키지를 제거<br>24시간 이내에 배포한 패키지만 제거 가능 (의존성 관계 때문에)                     |
+  | etc                                           |[https://docs.npmjs.com/cli-documentation/](https://docs.npmjs.com/cli-documentation/)                    |
+
 ## Distributing package
