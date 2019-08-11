@@ -108,5 +108,3 @@
   | npm publish                                   | 자신이 만든 패키지를 배포할 때 사용                                                                      |
   | npm unpublish                                 | 배포한 패키지를 제거<br>24시간 이내에 배포한 패키지만 제거 가능 (의존성 관계 때문에)                     |
   | etc                                           |[https://docs.npmjs.com/cli-documentation/](https://docs.npmjs.com/cli-documentation/)                    |
-
-## Distributing package
