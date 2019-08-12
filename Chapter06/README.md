@@ -40,11 +40,10 @@
   - express 패키지를 호출하여 app 변수 객체를 생성
     - 해당 변수에 각종 기능을 연결
   - app.set 메서드로 express 앱을 설정
-  - app.use 부분은 [미들웨어](#middleware)연결하는 부분
+  - app.use 부분은 미들웨어 연결하는 부분
   - 마지막엔 app 객체를 모듈로 만듦
     - bin/www에서 사용된 app 모듈
 
-<a name="middleware"></a>
 ## Middleware
 - 미들웨어는 익스프레스의 핵심
   - 요청과 응답 중간(middle)에 위치하여 미들웨어라고 부름
