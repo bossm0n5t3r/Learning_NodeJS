@@ -201,4 +201,98 @@
   - 일회성 메시지라는 성질을 이용하여 로그인 에러나 회원가입 에러 같은 일회성 경고 메시지 활용에 좋음
 
 ## Routing to Router object
+- Express 사용하는 이유 중 하나가 라우팅을 깔끔하게 관리 가능
+- ```js
+  ...
+  var indexRouter = require('./routes/index');
+  var usersRouter = require('./routes/users');
+  ...
+  app.use('/', indexRouter);
+  app.use('/users', usersRouter);
+  ...
+  ```
+  - use 대신에 get, post, put, patch, delete 같은 HTTP 메서드 사용 가능
+  - use 메서드는 모든 HTTP 메서드에 대해 요청 주소만 일치하면 실행
+  - get, post, put, patch, delete 같은 메서드는 주소뿐만 아니라 HTTP 메서드까지 일치하는 요청일 때만 실행
+- 라우터
+  - 라우터 파일들은 routes 폴더 안에 있음
+  - router 객체는 express.Router()로 생성
+  - 마지막에는 module.exports = router;로 라우터를 모듈로 만듦
+  - router에도 app처럼 use, get, post, put, patch, delete 같은 메서드를 붙일 수 있음
+    - use를 제외하고 HTTP 요청 메서드와 상응
+  - app.use 처럼 router 하나에 미들웨어를 여러 개 장착 가능
+  - 실제 라우터 로직이 실행되는 미들웨어 전에 로그인 여부 또는 관리자 여부를 체크하는 미들웨어를 중간에 넣어 두곤 함
+    - ```js
+      router.get('/', middleware1, middleware2, middleware3)
+      ```
+- 코드 설명
+  - ```js
+    router.get('/')
+    ```
+    - / 주소로 GET 요청을 하는 것과 같음
+  - ```js
+    res.render
+    ```
+    - 클라이언트에 응답 보냄
+    - 익스프레스가 응답 객체에 개로 추가한 메서드
+    - 템플릿 엔진을 사용하는 부분
+- 라우터에서는 반드시 요청에 대한 응답을 보내거나 에러 핸들러로 요청을 넘겨야 함
+- 응답을 보내지 않으면 브라우저는 계속 응답을 기다림
+- res 객체에 들어있는 메서드들로 응답을 보냄
+- next 함수에는 라우터에서만 동작하는 특수 기능이 존재
+  - ```js
+    next('route')
+    ```
+  - 라우터에 연결된 나머지 미들웨어들을 건너뛰고 싶을 때 사용
+- 라우터 주소에는 특수한 패턴을 사용 가능
+  - ```js
+    router.get('/users/:id', function(req, res) {
+        console.log(req.params, req.query);
+    });
+    ```
+  - 주소에 :id 가 있음
+    - /users/1 또는 /users/123 등의 요청이 라우터에 걸릴 때 req.params.id 를 통해서 조회가능
+    - :type 이면 req.params.type 으로 조회 가능
+  - 주소에 쿼리스트링을 쓸 때도 있음
+    - 쿼리스트링의 키-값 정보는 req.query 객체 안에 들어 있음
+  - Example
+    - ```js
+      /users/123?limit=5&skip=10
+      // 이라는 주소의 요청이 들어 왔을 때
+      // req.params 와 req.query 객체는 다음과 같다
+      // { id: '123' } { limit: '5', skip: '10' }
+      ```
+    - 요청 주소에 대한 정보가 담겨 있어서 요긴하게 활용 가능
+      - 주의할 점
+        - 일반 라우터보다 뒤에 위치
+        - 다양한 라우터를 아우르는 와일드카드 역할을 하므로 일반 라우터보다 뒤에 위치해야 다른 라우터를 방해하지 않음
+- 에러가 발생하지 않았다면 라우터는 요청을 보낸 클라이언트에게 응답을 보내줘야 함
+  - 응답 메서드
+    - send, sendFile, json, redirect, render 등
+  - send
+    - 만능 메서드
+    - 버퍼 데이터나 문자열 전송
+    - HTML 코드 전송
+    - JSON 데이터 전송
+  - sendFile
+    - 파일을 응답으로 보냄
+  - json
+    - JSON 데이터를 보냄
+  - redirect
+    - 응답을 다른 라우터로 보냄
+    - 로그인 완료 후 다시 메인 화면으로 돌아갈 때
+      - res.redirect(메인 화면 주소)
+  - 기본적으로 200 HTTP 상태 코드를, res.redirect는 302를 응답하지만, 직접 바꾸는 것이 가능
+    - status 메서드 사용
+      - ```js
+        res.status(404).send('Not Found')
+        ```
+  - render
+    - 템플릿 엔진을 렌더링할 때 사용
+  - 하나의 요청에 대한 응답은 한 번만 보내야 함
+    - 두 번 이상 보내면 에러 발생
+- 라우터가 요청을 처리하지 못하는 경우
+  - 요청을 처리할 수 있는 라우터가 없다면 다음 미들웨어로 넘어감
+  - 404 HTTP 상태 코드를 보내주어야 하므로 다음 미들웨어에서 새로운 에러를 만들고 에러의 상태코드를 404로 설정한 뒤 에러 처리 미들웨어로 넘김
+
 ## Using the template engine
