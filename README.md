@@ -17,3 +17,4 @@
 - [4. Creating a Web server with the http module](./Chapter04/README.md)
 - [5. Package Manager](./Chapter05/README.md)
 - [6. Create Express Web Server](./Chapter06/README.md)
+- [7. MySQL](./Chapter07/README.md)
