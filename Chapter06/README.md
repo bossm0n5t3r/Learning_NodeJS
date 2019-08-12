@@ -296,3 +296,13 @@
   - 404 HTTP 상태 코드를 보내주어야 하므로 다음 미들웨어에서 새로운 에러를 만들고 에러의 상태코드를 404로 설정한 뒤 에러 처리 미들웨어로 넘김
 
 ## Using the template engine
+- 템플릿 엔진은 자바스크립트를 사용해서 HTML을 렌더링할 수 있게 해줌
+- 대표적인 템플릿 엔진 Pug, EJS
+- [Pug (Jade)](https://pugjs.org/)
+  - 예전 이름이 Jade, 현재는 Pug
+  - 문법이 간단하여 코드의 양이 줄어듦
+  - 자세한 사항은 [해당 사이트](https://pugjs.org/) 참고
+- [EJS](https://ejs.co/)
+  - 자바의 JSP 문법과 상당히 유사
+  - 자세한 사항은 [해당 사이트](https://ejs.co/) 참고
+- Numjucks, Hogan, Dust, Twig, Vash 등 여러 템플릿 엔진 존재
