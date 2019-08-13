@@ -80,4 +80,30 @@
       ```
 
 ## CRUD
+- CREATE
+  - ```sql
+    INSERT INTO nodejs.users (name, age, married, comment)
+    VALUES ('zero', 24, 0, '자기소개1');
+    INSERT INTO nodejs.users (name, age, married, comment)
+    VALUES ('one', 32, 1, '자기소개2');
+
+    INSERT INTO nodejs.comments (commenter, comment)
+    VALUES (1, '안녕하세요. zero의 댓글입니다.');
+    ```
+- READ
+  - ```sql
+    SELECT * FROM nodejs.users;
+    SELECT * FROM nodejs.comments;
+    ```
+- UPDATE
+  - ```sql
+    UPDATE nodejs.users
+    SET comment = '바꿀 내용'
+    WHERE id = 2;
+    ```
+- DELETE
+  - ```sql
+    DELETE FROM nodejs.users WHERE id = 2;
+    ```
+
 ## Using Sequelize
