@@ -9,7 +9,19 @@
   - Oracle, MySQL, MSSQL 등
 
 ## Installing MySQL
-## Installing Workbench
+- Windows
+  - [공식 사이트](https://dev.mysql.com/downloads/installer/)
+  - Custom
+    - MySQL Server
+      - Authentication Method
+        - Use Legacy Authentication Method (Retain MySQL 5.x Compatibility) 선택
+        - 대부분의 회사가 MySQL 5 버전대를 사용하고 있으므로
+    - MySQL Workbench
+
+## Installing MySQL Workbench
+- Windows
+  - 위에서 함께 설치됨
+
 ## Creating databases and tables
 ## CRUD
 ## Using Sequelize
