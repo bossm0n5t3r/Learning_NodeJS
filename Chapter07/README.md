@@ -107,3 +107,103 @@
     ```
 
 ## Using Sequelize
+- MySQL 작업을 쉽게 할 수 있도록 도와주는 라이브러리
+- ORM (Object-relational Mapping) 으로 분류
+  - 객체와 데이터베이스의 릴레이션을 매핑해주는 도구
+- Sequelize 설치
+  - ```sh
+    npm i sequelize mysql2
+    npm i -g sequelize-cli
+    sequelize init          # config, models, migrations, seeders 폴더가 생성됨
+    ```
+- sequelize-cli 가 자동으로 생성해주는 models/index.js 코드는 그대로 사용 시 에러 발생
+  - 다음과 같이 수정
+  - ```js
+    const path = require('path');
+    const Sequelize = require('sequelize');
+
+    const env = process.env.NODE_ENV || 'development';
+    const config = require(path.join(__dirname, '..', 'config', 'config.json'))[env];
+    const db = {};
+
+    const sequelize = new Sequelize(config.database, config.username, config.password, config);
+
+    db.sequelize = sequelize;
+    db.Sequelize = Sequelize;
+
+    db.User = require('./user')(sequelize, Sequelize);
+    db.Comment = require('./comment')(sequelize, Sequelize);
+
+    db.User.hasMany(db.Comment, { foreignKey: 'commenter', sourceKey: 'id' });
+    db.Comment.belongsTo(db.User, { foreignKey: 'commenter', targetKey: 'id' });
+
+    module.exports = db;
+    ```
+- MySQL 연결하기
+  - ```js
+    ...
+    var indexRouter = require('./routes/index');
+    var usersRouter = require('./routes/users');
+    var sequelize = require('./models').sequelize;
+
+    var app = express();
+    sequelize.sync();
+    ...
+    ```
+  - 폴더 내의 index.js 파일은 require 시 이름을 생략 가능
+    - require('./models') = require('./models/index.js')
+  - sync 메서드를 사용하면 서버 실행 시 자동으로 MySQL과 연동
+- 모델 정의하기
+  - MySQL에서 정의한 테이블을 Sequelize 에서도 정의해야 함
+  - MySQL의 테이블은 Sequelize 의 모델과 대응
+  - Sequelize 는 모델과 MySQL의 테이블을 연결(Mapping)해주는 역할
+  - Seqeulize 는 기본적으로 모델 이름은 단수형으로, 테이블 이름은 복수형으로 사용
+  - [models/user.js](./7.6/learning-sequelize/models/user.js)
+    - 알아서 id를 기본 키로 연결하므로 id 컬럼은 적어줄 필요가 없음
+    - seqeulize.define 메서드로 테이블명과 각 컬럼의 스펙을 입력
+    - MySQL 테이블과 컬럼 내용이 일치해야 정확하게 대응
+    - [Seqeulize 의 자료형](https://sequelize.org/master/manual/data-types.html)
+    - define 메서드의 세 번째 인자는 테이블 옵션
+      - timestamps 속성의 값이 false
+        - created_at 컬럼을 만들었기 때문
+      - timestamps 속성이 true이면 Seqeulize는 createdAt 과 updateAt 컬럼을 추가
+      - 로우가 생성될 때와 수정될 때의 시간이 자동으로 입력
+  - 모델 생성 후 [models/index.js](./7.6/learning-sequelize/models/index.js)와 연결해야 함
+    - ```js
+      db.User = require('./user')(sequelize, Sequelize);
+      db.Comment = require('./comment')(sequelize, Sequelize);
+      ```
+    - db 라는 객체에 User와 Comment 모델을 담아둠
+    - db 를 require 하여 User와 Comment 모델에 접근 가능
+  - 마지막으로 [config/config.json](./7.6/learning-sequelize/config/config.json)수정
+    - ```json
+        {
+            "development": {
+                "username": "root",
+                "password": "password",
+                "database": "nodejs",
+                "host": "127.0.0.1",
+                "dialect": "mysql",
+                "operatorsAliases": false
+            },
+            ...
+        }
+      ```
+    - password 속성에는 MySQL 비밀번호 입력
+    - database 속성에는 nodejs (데이터베이스명)
+    - operatorsAliases 속성
+      - 보안에 취약한 연산자를 사용할지 여부를 설정하는 옵션
+    - 해당 설정은 process.env.NODE_ENV가 development 일 때 적용
+    - 나중에 배포할 때는 process.env.NODE_ENV를 production 속성으로 설정
+    - 배포 환경을 위해서 데이터베이스를 설정할 때는 config/config.json 의 production 속성을 수정
+    - test 일 때는 test 속성을 수정
+- 관계 정의하기
+  - 1 : N
+    - hasMany 메서드 사용
+      - users 테이블의 로우 하나를 불러올 때 연결된 comments 테이블의 로우들도 같이 불러올 수 있음
+    - 반대로 belongsTo 메서드도 존재
+      - comments 테이블의 로우를 불러올 때 연결된 users 테이블의 로우를 가져옴
+    - | 1       | :              | N       |
+      |:-------:|:--------------:|:-------:|
+      | User    |  - hasMany ->  | Comment |
+      | Comment | <- belongsTo - | User    |
