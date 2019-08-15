@@ -311,3 +311,41 @@
           where: { id: 2 },
         });
         ```
+- 쿼리 수행하기
+  - [views/sequelize.ejs](./7.6/learning-sequelize/views/sequelize.ejs) 생성
+  - [public/sequelize.js](./7.6/learning-sequelize/public/sequelize.js) 생성
+  - [app.js](./7.6/learning-sequelize/app.js)
+    - 라우터들 연결
+      - [commentsRouter](./7.6/learning-sequelize/routes/comments.js)
+  - [routes/index.js](./7.6/learning-sequelize/routes/index.js)
+    - GET, POST, PUT, DELETE 요청에 해당하는 라우터를 만듦
+    - ```js
+      router.get('/', function (req, res, next) {
+        User.findAll()
+          .then((users) => {
+            res.render('sequelize', { users });
+          })
+          .catch((err) => {
+            console.error(err);
+            next(err);
+          });
+      });
+      ```
+      - GET / 로 접속했을 때의 라우터
+      - User.findAll 메서드로 모든 사용자를 찾은 후
+      - [public/sequelize.js](./7.6/learning-sequelize/public/sequelize.js)를 랜더링할 때 결과값인 users를 넣어줌
+      - 시퀄라이즈는 프로미스를 기본적으로 지원하므로 then과 catch를 사용해서 각각 조회 성공 시와 실패 시의 정보를 얻을 수 있음
+      - async/await 문법
+        - ```js
+          router.get('/', async (req, res, next) => {
+            try {
+              const users = await User.findAll();
+              res.render('sequelize', { users });
+            } catch (error) {
+              console.error(error);
+              next(error);
+            }
+          });
+          ```
+  - [routes/users.js](./7.6/learning-sequelize/routes/users.js)
+  - [routes/comments.js](./7.6/learning-sequelize/routes/comments.js)
