@@ -207,3 +207,107 @@
       |:-------:|:--------------:|:-------:|
       | User    |  - hasMany ->  | Comment |
       | Comment | <- belongsTo - | User    |
+  - 1 : 1
+    - hasOne 메서드 사용
+    - belongsTo 와 hasOne이 반대여도 상관없음
+      - 1 : 1 이기 때문에
+    - | 1       | :              | 1       |
+      |:-------:|:--------------:|:-------:|
+      | User    |  - hasOne  ->  | Comment |
+      | Comment | <- belongsTo - | User    |
+  - N : M
+    - belongsToMany 메서드 사용
+    - | N       | :                   | M       |
+      |:-------:|:-------------------:|:-------:|
+      | Post    |  - belongsToMany -> | Hashtag |
+      | Hashtag | <- belongsToMany -  | Post    |
+    - async/await 코드로 작성
+      - ```js
+        async (req, res, next) => {
+          const tag = await Hashtag.find({ where: { title: '노드' } });
+          const posts = await tag.getPosts();
+        };
+        ```
+- 쿼리 알아보기
+  - 시퀄라이즈로 CRUD 작업을 하려면 먼저 시퀄라이즈 쿼리에 대해서 알아야 함
+  - SQL문을 자바스크립트로 생성하는 것이라 시퀄라이즈만의 방식이 있음
+  - 쿼리는 프로미스를 반환하므로 then을 붙여 결과값을 받을 수 있음
+  - async/await 문법과 같이 사용 가능
+  - Examples
+    - ```sql
+      INSERT INTO nodejs.users (name, age, married, comment)
+      VALUES ('zero', 24, 0, '자기소개1');
+      ```
+      - ```js
+        const { User } = require('../models');
+        User.create({
+          name: 'zero',
+          age: 24,
+          married: false,
+          comment: '자기소개1',
+        });
+        ```
+    - ```sql
+      SELECT * FROM nodejs.users;
+      ```
+      - ```js
+        User.findAll({});
+        ```
+    - 데이터를 하나만 가져올 때는 find 메서드, 여러 개 가져올 때는 findAll 메서드
+    - ```sql
+      SELECT * FROM nodejs.users LIMIT 1;
+      ```
+      - ```js
+        User.find({});
+        ```
+    - ```sql
+      SELECT name, married FROM nodejs.users;
+      ```
+      - ```js
+        User.findAll({
+          attributes: ['name', 'married'],
+        });
+        ```
+    - ```sql
+      SELECT name, age FROM nodejs.users WHERE married = 1 AND age > 30;
+      ```
+      - ```js
+        const { User, Sequelize: { Op } } = require('../models');
+        User.findAll({
+          attributes: ['name', 'age'],
+          where: {
+            married: 1,
+            age: { [Op.gt]: 30 },
+          },
+        });
+        ```
+    - | 연산자   | 의미                  |
+      |:--------:|:---------------------:|
+      | Op.gt    | 초과                  |
+      | Op.gte   | 이상                  |
+      | Op.lt    | 미만                  |
+      | Op.lte   | 이하                  |
+      | Op.ne    | 같지 않음             |
+      | Op.or    | 또는                  |
+      | Op.in    | 배열 요소 중 하나     |
+      | Op.notIn | 배열 요소와 모두 다름 |
+    - ```sql
+      UPDATE nodejs.users
+      SET comment = '바꿀 내용'
+      WHERE id = 2;
+      ```
+      - ```js
+        User.update({
+          comment: '바꿀 내용',
+        }, {
+          where: { id: 2 },
+        });
+        ```
+    - ```sql
+      DELETE FROM nodejs.users WHERE id = 2;
+      ```
+      - ```js
+        User.destory({
+          where: { id: 2 },
+        });
+        ```
